@@ -1,22 +1,26 @@
 import json
 import random
-
 import requests
 
 
-def flatten(l):
-    return [item for sublist in l for item in sublist]
+def flatten(l_f):
+    """flatten stuff"""
+    return [item for sublist in l_f for item in sublist]
 
 
-def findSim(text):
-    text = text
+def find_sim(text):
+    """
+    connects to api and gets all the data
+    :param text:
+    :return:
+    """
     key = "get key from merriam webster api for free"
     url = f"https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{text}?key={key}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=10000)
 
-    jt = json.loads(response.text)
+    json_loaded = json.loads(response.text)
     try:
-        data = jt[0]['def'][0]['sseq'][0][0][1]
+        data = json_loaded[0]['def'][0]['sseq'][0][0][1]
     except TypeError:
         return text, True
     except IndexError:
@@ -25,14 +29,14 @@ def findSim(text):
     return [n['wd'] for n in sum(flatten(sim_list), [])], False
 
 
-line = "bro thinks hes tough talking on tiktok, if you ever see me on the streets you better run because i don't play no games"
+LINE = "bro thinks hes tough talking on tiktok, if you ever see me on the streets you better run because i don't play no games"
 dnt = ['on', 'the', 'if', 'no', 'your', 'him', 'you']
-txtArray = line.split(' ')
+txtArray = LINE.split(' ')
 a = []
 for word in txtArray:
     if word == '':
         break
-    f_out = findSim(word)
+    f_out = find_sim(word)
     if word in dnt:
         a.append(word)
     elif f_out[1]:
